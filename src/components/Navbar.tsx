@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { MenuIcon } from "lucide-react";
 import Link from "next/link";
@@ -29,13 +29,14 @@ export default function Navbar() {
         <button
           className="md:hidden text-gray-700 focus:outline-none"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         >
           <MenuIcon className="w-6 h-6" />
         </button>
 
         {/* Mobile Dropdown */}
         {isMenuOpen && (
-          <div className="absolute top-16 right-6 bg-white shadow-md rounded-lg w-48 py-2 flex flex-col space-y-2 md:hidden">
+          <div className="absolute top-16 right-6 bg-white shadow-md rounded-lg w-48 py-2 flex flex-col space-y-2 md:hidden transition duration-200 ease-in-out">
             <NavLink href="#features" onClick={() => setIsMenuOpen(false)}>
               Features
             </NavLink>

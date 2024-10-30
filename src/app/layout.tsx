@@ -4,7 +4,7 @@ import "./globals.css";
 import { Suspense } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import Container from "@/components/Container";
-import {AuthProvider} from "@/components/AuthProvider";
+import { AuthProvider } from "@/components/AuthProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,23 +29,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Suspense fallback={<p>Loading feed...</p>}>
           <AuthProvider>
-            <Container>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                {children}
-              </ThemeProvider>
-            </Container>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
           </AuthProvider>
-      </Suspense>
+        </Suspense>
       </body>
     </html>
   );
