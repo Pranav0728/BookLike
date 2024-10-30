@@ -9,8 +9,7 @@ function HomeNavbar() {
 
   return (
     <nav
-      className="mx-auto flex max-w-6xl items-center justify-between px-4 pb-10 pt-4 md:px-8"
-      aria-label="Global"
+      className="mx-auto flex w-[80%] items-center justify-between px-4 pb-10 pt-4 md:px-8"
     >
       <div className="flex items-center gap-2">
         <img

@@ -19,7 +19,7 @@ export default function BooksDashboard() {
   };
 
   return (
-    <div className='max-w-5xl mx-auto mt-10 px-5'>
+    <div className='w-[70%] mx-auto mt-10 px-5'>
       <h1>My Books</h1>
       {/* Display books list with styled cards */}
       <div className='flex gap-10'>

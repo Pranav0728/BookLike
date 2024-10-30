@@ -2,21 +2,24 @@
 import { useState, useEffect } from "react";
 
 export default function Book() {
-  const [pageTexts, setPageTexts] = useState([{ left: "", right: "" }]);
+  const [leftPageText, setLeftPageText] = useState([""]);
+  const [rightPageText, setRightPageText] = useState([""]);
   const [pageIndex, setPageIndex] = useState(0);
   const maxLines = 16; // Set a maximum number of lines per page
 
   useEffect(() => {
-    // Ensure there's at least one page initialized
-    if (pageTexts.length === 0) addPage();
+    // Initialize pages if they are empty
+    if (leftPageText.length === 0) setLeftPageText([""]);
+    if (rightPageText.length === 0) setRightPageText([""]);
   }, []);
 
   const addPage = () => {
-    setPageTexts((prev) => [...prev, { left: "", right: "" }]);
+    setLeftPageText((prev) => [...prev, ""]);
+    setRightPageText((prev) => [...prev, ""]);
   };
 
   const handleNextPage = () => {
-    if (pageIndex < pageTexts.length - 1) {
+    if (pageIndex < leftPageText.length - 1) {
       setPageIndex(pageIndex + 1);
     } else {
       addPage();
@@ -34,11 +37,19 @@ export default function Book() {
 
     // Check if current text exceeds maxLines
     if (lines.length <= maxLines) {
-      setPageTexts((prev) => {
-        const updatedPages = [...prev];
-        updatedPages[pageIndex][side] = text; // Update the relevant side
-        return updatedPages;
-      });
+      if (side === "left") {
+        setLeftPageText((prev) => {
+          const updatedPages = [...prev];
+          updatedPages[pageIndex] = text;
+          return updatedPages;
+        });
+      } else {
+        setRightPageText((prev) => {
+          const updatedPages = [...prev];
+          updatedPages[pageIndex] = text;
+          return updatedPages;
+        });
+      }
     }
   };
 
@@ -53,11 +64,11 @@ export default function Book() {
           <textarea
             rows={maxLines}
             className="w-full h-full bg-transparent outline-none resize-none text-gray-800 text-lg font-serif"
-            // style={{
-            //   backgroundImage: "linear-gradient(to top, #e0e0e0 1px, transparent 1px)",
-            //   backgroundSize: "100% 28px",
-            // }}
-            value={pageTexts[pageIndex]?.left || ""}
+            style={{
+              backgroundImage: "linear-gradient(to top, #e0e0e0 1px, transparent 1px)",
+              backgroundSize: "100% 28px",
+            }}
+            value={leftPageText[pageIndex]}
             onChange={(e) => handleTextChange(e, "left")}
           />
         </div>
@@ -70,11 +81,11 @@ export default function Book() {
           <textarea
             rows={maxLines}
             className="w-full h-full bg-transparent outline-none resize-none text-gray-800 text-lg font-serif"
-            // style={{
-            //   backgroundImage: "linear-gradient(to top, #e0e0e0 1px, transparent 1px)",
-            //   backgroundSize: "100% 28px",
-            // }}
-            value={pageTexts[pageIndex]?.right || ""}
+            style={{
+              backgroundImage: "linear-gradient(to top, #e0e0e0 1px, transparent 1px)",
+              backgroundSize: "100% 28px",
+            }}
+            value={rightPageText[pageIndex]}
             onChange={(e) => handleTextChange(e, "right")}
           />
         </div>
@@ -89,14 +100,12 @@ export default function Book() {
           onClick={handlePrevPage}
           disabled={pageIndex === 0}
           className="px-4 py-2 bg-[#474a58] text-white rounded-md disabled:bg-gray-300"
-          aria-label="Previous Page"
         >
           Previous
         </button>
         <button
           onClick={handleNextPage}
           className="px-4 py-2 bg-[#766336] text-white rounded-md"
-          aria-label="Next Page"
         >
           Next
         </button>

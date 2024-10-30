@@ -5,17 +5,11 @@ import { Suspense } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import Container from "@/components/Container";
 import { AuthProvider } from "@/components/AuthProvider";
+import { Inter } from "next/font/google";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+
+const inter = Inter({ subsets: ["latin"] });
+
 
 export const metadata: Metadata = {
   title: "BookLike",
@@ -29,20 +23,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Suspense fallback={<p>Loading feed...</p>}>
+        <body className={`${inter.className} flex flex-col`}>
+      <Suspense fallback={<p>Loading feed...</p>}>
           <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-            </ThemeProvider>
+            <Container>
+              {/* <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              > */}
+                {children}
+              {/* </ThemeProvider> */}
+            </Container>
           </AuthProvider>
-        </Suspense>
-      </body>
+      </Suspense>
+        </body>
     </html>
   );
 }
+
