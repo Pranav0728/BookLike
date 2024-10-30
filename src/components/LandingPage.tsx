@@ -1,13 +1,15 @@
 // app/page.tsx
+"use client"
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRightIcon, BookIcon, CloudIcon, PencilIcon } from "lucide-react";
 import Image from "next/image";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
+  const router = useRouter();
   return (
     <>
     <Navbar/>
@@ -22,7 +24,7 @@ export default function LandingPage() {
           just like a real book. Personalize every detail, from fonts to ink
           colors, and flip through pages with ease.
         </p>
-        <Button variant="primary" size="lg" className="rounded-full px-8 py-3">
+        <Button variant="primary" size="lg" className="rounded-full px-8 py-3" onClick={()=>{router.push('/books')}}>
           Get Started <ArrowRightIcon className="ml-2 w-4 h-4" />
         </Button>
       </section>
@@ -65,7 +67,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="max-w-5xl mx-auto my-24 text-center">
+      <section className="max-w-5xl mx-auto my-24 text-center pricing" id="pricing">
         <h2 className="text-4xl font-bold mb-4 ">Choose Your Plan</h2>
         <p className="text-lg  mb-12">
           Start with the free version or unlock the full experience with our
