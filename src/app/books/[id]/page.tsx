@@ -1,18 +1,75 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 
-export default function Page() {
-  const [leftPageText, setLeftPageText] = useState([""]);
-  const [rightPageText, setRightPageText] = useState([""]);
-  const [pageIndex, setPageIndex] = useState(0);
+interface PageContent {
+  bookId: string;
+  pageNumber: number;
+  content: string;
+}
+
+export default function Book() {
+  const { id } = useParams(); // Fetch the book ID from URL parameters
+  const [leftPageText, setLeftPageText] = useState<string[]>([""]);
+  const [rightPageText, setRightPageText] = useState<string[]>([""]);
+  const [pageIndex, setPageIndex] = useState<number>(0);
   const maxLines = 16;
 
+  useEffect(() => {
+    // Initialize pages if they are empty
+    if (leftPageText.length === 0) setLeftPageText([""]);
+    if (rightPageText.length === 0) setRightPageText([""]);
+
+    // Fetch book pages when the component mounts
+    const fetchBookPages = async () => {
+      try {
+        const response = await fetch(`/api/bookPages?bookId=${id}`, {
+          method: 'GET',
+        });
+
+        // Check if the response is OK (status code 200-299)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json(); // Now parse the response as JSON
+
+        if (data.message && data.message.pages) {
+          const pages: PageContent[] = data.message.pages;
+          const leftPages: string[] = [];
+          const rightPages: string[] = [];
+
+          pages.forEach((page, index) => {
+            if (index % 2 === 0) {
+              leftPages.push(page.content);
+            } else {
+              rightPages.push(page.content);
+            }
+          });
+
+          setLeftPageText(leftPages);
+          setRightPageText(rightPages);
+        }
+      } catch (error) {
+        console.error("Failed to fetch book pages:", error);
+      }
+    };
+
+    fetchBookPages();
+
+    // Cleanup function to save content when the component unmounts
+    return () => {
+      savePageContent();
+    };
+  }, [id]); // Fetch pages whenever the id changes
+
   const addPage = () => {
-    setLeftPageText([...leftPageText, ""]);
-    setRightPageText([...rightPageText, ""]);
+    setLeftPageText((prev) => [...prev, ""]);
+    setRightPageText((prev) => [...prev, ""]);
   };
 
   const handleNextPage = () => {
+    savePageContent(); // Save current page before moving
     if (pageIndex < leftPageText.length - 1) {
       setPageIndex(pageIndex + 1);
     } else {
@@ -22,23 +79,66 @@ export default function Page() {
   };
 
   const handlePrevPage = () => {
+    savePageContent(); // Save current page before moving
     if (pageIndex > 0) setPageIndex(pageIndex - 1);
   };
 
-  const handleTextChange = (e, side) => {
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>, side: "left" | "right") => {
     const text = e.target.value;
     const lines = text.split("\n");
 
     if (lines.length <= maxLines) {
       if (side === "left") {
-        const updatedPages = [...leftPageText];
-        updatedPages[pageIndex] = text;
-        setLeftPageText(updatedPages);
+        setLeftPageText((prev) => {
+          const updatedPages = [...prev];
+          updatedPages[pageIndex] = text;
+          return updatedPages;
+        });
       } else {
-        const updatedPages = [...rightPageText];
-        updatedPages[pageIndex] = text;
-        setRightPageText(updatedPages);
+        setRightPageText((prev) => {
+          const updatedPages = [...prev];
+          updatedPages[pageIndex] = text;
+          return updatedPages;
+        });
       }
+    }
+  };
+
+  const savePageContent = async () => {
+    const contentLeft = {
+      bookId: id,
+      pageNumber: pageIndex * 2 + 1, // Save left page content
+      content: leftPageText[pageIndex], // Adjust as needed
+    };
+
+    const contentRight = {
+      bookId: id,
+      pageNumber: pageIndex * 2 + 2, // Save right page content
+      content: rightPageText[pageIndex], // Adjust as needed
+    };
+
+    try {
+      // Save left page content
+      await fetch('/api/bookPages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contentLeft),
+      });
+
+      // Save right page content if it's not empty
+      if (rightPageText[pageIndex]) {
+        await fetch('/api/bookPages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contentRight),
+        });
+      }
+    } catch (error) {
+      console.error("Failed to save page content:", error);
     }
   };
 
@@ -53,10 +153,6 @@ export default function Page() {
           <textarea
             rows={maxLines}
             className="w-full h-full bg-transparent outline-none resize-none text-gray-800 text-lg font-serif"
-            // style={{
-            //   backgroundImage: "linear-gradient(to top, #e0e0e0 1px, transparent 1px)",
-            //   backgroundSize: "100% 28px"
-            // }}
             value={leftPageText[pageIndex]}
             onChange={(e) => handleTextChange(e, "left")}
           />
@@ -70,10 +166,6 @@ export default function Page() {
           <textarea
             rows={maxLines}
             className="w-full h-full bg-transparent outline-none resize-none text-gray-800 text-lg font-serif"
-            // style={{
-            //   backgroundImage: "linear-gradient(to top, #e0e0e0 1px, transparent 1px)",
-            //   backgroundSize: "100% 28px"
-            // }}
             value={rightPageText[pageIndex]}
             onChange={(e) => handleTextChange(e, "right")}
           />

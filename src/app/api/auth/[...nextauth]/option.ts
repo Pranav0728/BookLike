@@ -43,7 +43,7 @@ export const authOptions: NextAuthOptions = {
               email: user.email,
               username: user.name,
               image: user.image,
-              books:[]
+              Book:[]
             });
             await newUser.save();
             existingUser = newUser;
