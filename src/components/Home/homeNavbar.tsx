@@ -34,19 +34,12 @@ function HomeNavbar() {
                 )}
               </Avatar>
               <span className="text-sm mx-2">{session.user.name}</span>
-              <Button className="mx-2" size="tiny" onClick={() => signOut()} aria-label="Log out">
+              <Button className="mx-2 p-2" size="tiny" onClick={() => signOut()} aria-label="Log out">
                 Log out
               </Button>
             </div>
           ) : (
-            <Button
-              onClick={() => {/* Handle sign-in logic */}}
-              className="flex justify-center items-center"
-              type="button"
-              aria-label="Sign in"
-            >
-              Sign in
-            </Button>
+            <></>
           )}
         </div>
       </div>

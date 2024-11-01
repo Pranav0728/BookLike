@@ -2,6 +2,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { Button } from '../ui/button';
 // Dummy data for user's books
 const booksData = [
   { id: 1, title: "Book One", author: "Author A" },
@@ -19,8 +20,17 @@ export default function BooksDashboard() {
   };
 
   return (
-    <div className='w-[70%] mx-auto mt-10 px-5'>
+    <div className='w-[70%] mx-auto mt-10 px-5 '>
+      <div className='flex justify-between items-center my-5'>
       <h1>My Books</h1>
+      <Button>
+        Add New Book
+        <span className='ml-2 text-sm font-semibold text-gray-600'>
+          +
+        </span>
+      </Button>
+      </div>
+
       {/* Display books list with styled cards */}
       <div className='flex gap-10'>
         {booksData.map((book) => (

@@ -12,6 +12,9 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  emailVerified:{
+    type:Date
+  },
   books: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Book",
