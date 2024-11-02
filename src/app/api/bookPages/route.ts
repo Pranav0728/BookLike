@@ -1,43 +1,47 @@
-// src/app/api/book-pages/[bookId]/route.ts
-import dbConnect from "@/lib/dbConnect";
-import BookPage from "@/lib/Models/BookPage"; // Adjust the import based on your file structure
 import { NextResponse } from "next/server";
+import dbConnect from "@/lib/dbConnect";
+import Book from "@/lib/Models/Book";
+import BookPage from "@/lib/Models/BookPage";
 
-// Define the request body interface
-interface BookPageRequestBody {
-  bookId: string;
-  pageNumber: number;
-  content: string;
-}
+export const POST = async (req) => {
+  await dbConnect();
 
-// POST handler to create a new book page
-export const POST = async (req: Request) => {
+  const { bookId, pageNumber, content } = await req.json();
+
   try {
-    await dbConnect();
-    const body = await req.json();
-    const { bookId, pageNumber, content } = body as BookPageRequestBody;
+    // Check if page already exists
+    let page = await BookPage.findOne({ bookId, pageNumber });
 
-    // Create and save a new book page
-    const newPage = new BookPage({ bookId, pageNumber, content });
-    await newPage.save();
+    if (page) {
+      // Update content if the page exists
+      page.content = content;
+      page.lastModified = new Date();
+    } else {
+      // Create a new page if it doesn't exist
+      page = new BookPage({ bookId, pageNumber, content });
+      await Book.findByIdAndUpdate(bookId, {
+        $push: { pages: page._id },
+        lastModified: new Date(),
+      });
+    }
 
-    return NextResponse.json({ message: { page: newPage } }, { status: 200 });
-  } catch (e: any) {
-    return NextResponse.json({ message: { error: e.message } }, { status: 500 });
+    await page.save();
+
+    return NextResponse.json({ success: true, page }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };
 
-// GET handler to fetch book pages by bookId
-export const GET = async (req: Request, { params }: { params: { bookId: string } }) => {
+export const GET = async (req) => {
+  await dbConnect();
+  const bookId = req.nextUrl.searchParams.get("bookId");
+
   try {
-    await dbConnect();
-    const { bookId } = params; // Get bookId from route parameters
-
-    // Fetch all pages for the specified bookId
-    const pages = await BookPage.find({ bookId }).sort({ pageNumber: 1 }); // Sort by page number
-
-    return NextResponse.json({ message: { pages } }, { status: 200 });
-  } catch (e: any) {
-    return NextResponse.json({ message: { error: e.message } }, { status: 500 });
+    // Retrieve pages for a given book
+    const pages = await BookPage.find({ bookId }).sort("pageNumber");
+    return NextResponse.json({ success: true, pages }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 };

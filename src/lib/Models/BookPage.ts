@@ -1,4 +1,3 @@
-// models/Page.js
 import mongoose from "mongoose";
 
 const BookPageSchema = new mongoose.Schema({
@@ -15,13 +14,11 @@ const BookPageSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  styling: {
-    font: { type: String, default: "serif" },
-    fontSize: { type: String, default: "16px" },
-    inkColor: { type: String, default: "#000000" },
-    backgroundColor: { type: String, default: "#FFFFFF" },
-  },
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  lastModified: {
     type: Date,
     default: Date.now,
   },
